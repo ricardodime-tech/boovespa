@@ -47,18 +47,27 @@
         }
 
         .logo {
-            height: 120px;
+            height: 150px;
             width: auto;
             object-fit: contain;
         }
 
+        /* Restaurado: Título em Letras Douradas com Gradiente */
         h1 {
             margin: 0;
             font-family: 'Montserrat', 'Trebuchet MS', Arial, sans-serif;
-            font-size: 2.2rem;
+            font-size: 2.6rem;
             font-weight: 800;
             letter-spacing: -0.5px;
-            color: #111827;
+            
+            /* Gradiente dourado fechado e profissional */
+            background: linear-gradient(135deg, #997420 0%, #b8860b 50%, #7a5814 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            
+            /* Sombra suave para dar destaque ideal no fundo branco */
+            filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.12));
             line-height: 1.1;
         }
 
@@ -98,7 +107,7 @@
             padding: 10px 12px 10px 36px;
             border: 1px solid #cbd5e1;
             border-radius: 8px;
-            min-width: 240px;
+            min-width: 220px;
             font-size: 14px;
             outline: none;
             transition: border-color 0.2s;
@@ -108,7 +117,7 @@
             border-color: #047857;
         }
 
-        /* Padronização dos botões (Estilo inspirado na referência) */
+        /* Padronização dos botões (Estilo com ícone) */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -346,26 +355,27 @@
 <div class="container">
     <div class="topbar">
         <div class="header-left">
-            <!-- Caso não tenha a logo física, use texto ou mantenha a tag img -->
-            <h1>Histórico de Ações - Sistema Pluto</h1>
+            <!-- Restaurado: Imagem da logo e Título Dourado -->
+            <img src="logo.png" alt="Logo" class="logo">
+            <h1>Painel BOVESPA - Ações</h1>
         </div>
 
         <div class="toolbar">
-            <!-- Campo de busca com ícone de Lupa em SVG -->
+            <!-- Campo de busca com ícone de Lupa -->
             <div class="search-box">
                 <svg viewBox="0 0 24 24"><path d="M21.71 20.29l-5.002-5.002C17.824 13.57 18.5 11.858 18.5 10c0-4.687-3.813-8.5-8.5-8.5S1.5 5.313 1.5 10s3.813 8.5 8.5 8.5c1.858 0 3.57-.676 5.288-1.788l5.002 5.002c.39.39 1.024.39 1.414 0 .39-.39.39-1.024 0-1.424zM10 16.5c-3.59 0-6.5-2.91-6.5-6.5s2.91-6.5 6.5-6.5 6.5 2.91 6.5 6.5-2.91 6.5-6.5 6.5z"/></svg>
                 <input
                     id="filtroTicker"
                     class="filtro-ticker"
                     type="text"
-                    placeholder="Buscar papéis (ex: PETR4, VALE3)..."
+                    placeholder="Buscar por ticker..."
                     autocomplete="off"
                 >
             </div>
             
             <span id="ultimaAtualizacao" class="status">Última atualização: --</span>
             
-            <!-- Botão Atualizar (Verde com ícone) -->
+            <!-- Botão Atualizar Verde com Ícone -->
             <button id="btnAtualizarCotacoes" class="btn btn-verde">
                 <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
                 Atualizar cotações
