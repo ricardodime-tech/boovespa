@@ -329,6 +329,30 @@
         };
     }
 
+    // Função auxiliar para extrair o valor de dentro dos parênteses da string de variação diária
+    function extrairValorParenteses(variacaoTexto) {
+        if (!variacaoTexto || typeof variacaoTexto !== 'string') return { texto: '-', classe: 'neutral' };
+
+        const match = variacaoTexto.match(/\(([^)]+)\)/);
+        if (!match) return { texto: '-', classe: 'neutral' };
+
+        // Remove o sinal '%' e espaços para converter em número
+        const conteudo = match[1].trim();
+        const numeroLimpo = Number(conteudo.replace('%', '').replace('+', '').replace(',', '.'));
+
+        if (isNaN(numeroLimpo) || numeroLimpo === 0) {
+            return { texto: conteudo, classe: 'neutral' };
+        }
+
+        const sinal = numeroLimpo > 0 ? '+' : '';
+        const classe = numeroLimpo > 0 ? 'positivo' : 'negativo';
+
+        return {
+            texto: `${sinal}${numeroLimpo.toFixed(2)}%`,
+            classe
+        };
+    }
+
     function aplicarFiltroTicker() {
         const filtro = document.getElementById('filtroTicker').value.trim().toUpperCase();
         const linhas = document.querySelectorAll('#corpo-tabela tr');
@@ -695,15 +719,15 @@
                 const nome = acao.nome || acao.Nome || acao.empresa || acao.Empresa || '-';
                 const preco = acao.preco_atual ?? acao.Cotacao ?? acao.preco ?? '-';
 
-                // Variação Diária (ajuste as chaves do seu JSON conforme necessário, ex: variacao / variacao_percent)
-                const variacaoDiaria = acao.variacao ?? acao.variacao_diaria ?? undefined;
-                const variacaoDiariaPercent = acao.variacao_percent ?? acao.variacao_diaria_percent ?? undefined;
-                const resultadoDiaria = formatarVariacao(variacaoDiaria, variacaoDiariaPercent);
+                // Dados originais de variação
+                const variacaoBruta = acao.variacao ?? undefined;
+                const variacaoPercentualBruta = acao.variacao_percent ?? undefined;
+                
+                // Formata a variação diária normalmente
+                const resultadoDiaria = formatarVariacao(variacaoBruta, variacaoPercentualBruta);
 
-                // Variação Mensal (ajuste as chaves do seu JSON conforme necessário, ex: variacao_mensal / variacao_mensal_percent)
-                const variacaoMensal = acao.variacao_mensal ?? undefined;
-                const variacaoMensalPercent = acao.variacao_mensal_percent ?? undefined;
-                const resultadoMensal = formatarVariacao(variacaoMensal, variacaoMensalPercent);
+                // Pega o segundo valor (dentro dos parênteses) da variação diária para preencher a mensal
+                const resultadoMensal = extrairValorParenteses(resultadoDiaria.texto);
 
                 tr.dataset.ticker = String(ticker);
                 tr.innerHTML = `
