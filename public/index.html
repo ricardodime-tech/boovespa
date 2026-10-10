@@ -47,7 +47,7 @@
         }
 
         .logo {
-            height: 150px;
+            height: 120px;
             width: auto;
             object-fit: contain;
         }
@@ -55,18 +55,10 @@
         h1 {
             margin: 0;
             font-family: 'Montserrat', 'Trebuchet MS', Arial, sans-serif;
-            font-size: 2.6rem;
+            font-size: 2.2rem;
             font-weight: 800;
             letter-spacing: -0.5px;
-            
-            /* Gradiente dourado fechado e profissional, sem tons claros/brancos */
-            background: linear-gradient(135deg, #997420 0%, #b8860b 50%, #7a5814 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            
-            /* Sombra suave para dar destaque ideal no fundo branco */
-            filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.12));
+            color: #111827;
             line-height: 1.1;
         }
 
@@ -86,31 +78,85 @@
             padding: 8px 12px;
         }
 
-        .filtro-ticker {
-            padding: 10px 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            min-width: 200px;
-            font-size: 14px;
+        /* Container do input de busca com ícone de Lupa */
+        .search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
         }
 
-        .btn-atualizar {
-            background: #004a80;
-            color: #fff;
+        .search-box svg {
+            position: absolute;
+            left: 12px;
+            width: 16px;
+            height: 16px;
+            fill: #64748b;
+            pointer-events: none;
+        }
+
+        .filtro-ticker {
+            padding: 10px 12px 10px 36px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            min-width: 240px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .filtro-ticker:focus {
+            border-color: #047857;
+        }
+
+        /* Padronização dos botões (Estilo inspirado na referência) */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             border: none;
-            padding: 10px 18px;
+            padding: 10px 16px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
+            color: #fff;
             transition: 0.2s ease;
+            text-decoration: none;
         }
 
-        .btn-atualizar:hover {
-            background: #003a66;
+        .btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
         }
 
-        .btn-atualizar:disabled {
+        .btn-verde {
+            background: #047857;
+        }
+
+        .btn-verde:hover {
+            background: #065f46;
+        }
+
+        .btn-vermelho {
+            background: #dc2626;
+        }
+
+        .btn-vermelho:hover {
+            background: #b91c1c;
+        }
+
+        .btn-cinza {
+            background: #e2e8f0;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+        }
+
+        .btn-cinza:hover {
+            background: #cbd5e1;
+        }
+
+        .btn:disabled {
             opacity: 0.7;
             cursor: not-allowed;
         }
@@ -130,7 +176,7 @@
             width: 18px;
             height: 18px;
             border: 3px solid #dbeafe;
-            border-top-color: #2563eb;
+            border-top-color: #047857;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
@@ -145,6 +191,7 @@
             margin-top: 20px;
             overflow: hidden;
             border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         th, td {
@@ -168,8 +215,17 @@
             background: #1e293b;
         }
 
-        tr:hover {
+        /* Cores alternadas na tabela (Zebra Striping) */
+        tbody tr:nth-child(even) {
             background-color: #f8fafc;
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        tr:hover {
+            background-color: #f1f5f9 !important;
         }
 
         .positivo {
@@ -203,7 +259,7 @@
         }
 
         .ticker-btn:hover {
-            color: #2563eb;
+            color: #047857;
             text-decoration: underline;
         }
 
@@ -290,20 +346,30 @@
 <div class="container">
     <div class="topbar">
         <div class="header-left">
-            <img src="logo.png" alt="Logo" class="logo">
-            <h1>Painel BOVESPA - Ações</h1>
+            <!-- Caso não tenha a logo física, use texto ou mantenha a tag img -->
+            <h1>Histórico de Ações - Sistema Pluto</h1>
         </div>
 
         <div class="toolbar">
-            <input
-                id="filtroTicker"
-                class="filtro-ticker"
-                type="text"
-                placeholder="Buscar por ticker..."
-                autocomplete="off"
-            >
+            <!-- Campo de busca com ícone de Lupa em SVG -->
+            <div class="search-box">
+                <svg viewBox="0 0 24 24"><path d="M21.71 20.29l-5.002-5.002C17.824 13.57 18.5 11.858 18.5 10c0-4.687-3.813-8.5-8.5-8.5S1.5 5.313 1.5 10s3.813 8.5 8.5 8.5c1.858 0 3.57-.676 5.288-1.788l5.002 5.002c.39.39 1.024.39 1.414 0 .39-.39.39-1.024 0-1.424zM10 16.5c-3.59 0-6.5-2.91-6.5-6.5s2.91-6.5 6.5-6.5 6.5 2.91 6.5 6.5-2.91 6.5-6.5 6.5z"/></svg>
+                <input
+                    id="filtroTicker"
+                    class="filtro-ticker"
+                    type="text"
+                    placeholder="Buscar papéis (ex: PETR4, VALE3)..."
+                    autocomplete="off"
+                >
+            </div>
+            
             <span id="ultimaAtualizacao" class="status">Última atualização: --</span>
-            <button id="btnAtualizarCotacoes" class="btn-atualizar">Atualizar cotações</button>
+            
+            <!-- Botão Atualizar (Verde com ícone) -->
+            <button id="btnAtualizarCotacoes" class="btn btn-verde">
+                <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+                Atualizar cotações
+            </button>
         </div>
     </div>
 
@@ -525,7 +591,7 @@
         ctx.font = '700 20px Arial';
         ctx.fillText(nomeExibicao, padding.left, 30);
 
-        ctx.fillStyle = '#0f9f6e';
+        ctx.fillStyle = '#047857';
         ctx.font = '700 24px Arial';
         ctx.fillText(`R$ ${valorAtual.toFixed(2)}`, padding.left, 62);
 
@@ -840,7 +906,7 @@
         const btn = document.getElementById('btnAtualizarCotacoes');
 
         btn.disabled = true;
-        btn.textContent = 'Atualizando...';
+        btn.innerHTML = 'Atualizando...';
 
         try {
             const response = await fetch('/api/acoes', {
@@ -861,7 +927,10 @@
             alert(error.message);
         } finally {
             btn.disabled = false;
-            btn.textContent = 'Atualizar cotações';
+            btn.innerHTML = `
+                <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+                Atualizar cotações
+            `;
         }
     });
 
