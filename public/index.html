@@ -334,33 +334,45 @@
         const classe = valor > 0 ? 'positivo' : valor < 0 ? 'negativo' : 'neutral';
 
         return {
-            texto: `${sinal}${valor.toFixed(2)} (${sinal}${percentual.toFixed(2)}%)`,
+            // Omitido o percentual entre parênteses, mostrando apenas o valor principal
+            texto: `${sinal}${valor.toFixed(2)}`,
             numero: Number(valor.toFixed(2)),
             classe
         };
     }
 
-    function extrairValorParenteses(variacaoTexto) {
-        if (!variacaoTexto || typeof variacaoTexto !== 'string') return { texto: '-', numero: 0, classe: 'neutral' };
-
-        const match = variacaoTexto.match(/\(([^)]+)\)/);
-        if (!match) return { texto: '-', numero: 0, classe: 'neutral' };
-
-        const conteudo = match[1].trim();
-        const numeroLimpo = Number(conteudo.replace('%', '').replace('+', '').replace(',', '.'));
-
-        if (isNaN(numeroLimpo) || numeroLimpo === 0) {
-            return { texto: conteudo, numero: 0, classe: 'neutral' };
+    function extrairValorParenteses(variacaoTextoOriginal, valorBruto, percentualBruto) {
+        // Tenta extrair o parêntese do dado original, se existir
+        if (variacaoTextoOriginal && typeof variacaoTextoOriginal === 'string') {
+            const match = variacaoTextoOriginal.match(/\(([^)]+)\)/);
+            if (match) {
+                const conteudo = match[1].trim();
+                const numeroLimpo = Number(conteudo.replace('%', '').replace('+', '').replace(',', '.'));
+                if (!isNaN(numeroLimpo)) {
+                    const sinal = numeroLimpo > 0 ? '+' : '';
+                    const classe = numeroLimpo > 0 ? 'positivo' : numeroLimpo < 0 ? 'negativo' : 'neutral';
+                    return {
+                        texto: `${sinal}${numeroLimpo.toFixed(2)}%`,
+                        numero: Number(numeroLimpo.toFixed(2)),
+                        classe
+                    };
+                }
+            }
         }
 
-        const sinal = numeroLimpo > 0 ? '+' : '';
-        const classe = numeroLimpo > 0 ? 'positivo' : 'negativo';
+        // Alternativa caso venha separado por propriedades individuais (ex: variacao_percent)
+        const percentual = Number(percentualBruto ?? 0);
+        if (Number.isFinite(percentual) && percentual !== 0) {
+            const sinal = percentual > 0 ? '+' : '';
+            const classe = percentual > 0 ? 'positivo' : 'negativo';
+            return {
+                texto: `${sinal}${percentual.toFixed(2)}%`,
+                numero: Number(percentual.toFixed(2)),
+                classe
+            };
+        }
 
-        return {
-            texto: `${sinal}${numeroLimpo.toFixed(2)}%`,
-            numero: Number(numeroLimpo.toFixed(2)),
-            classe
-        };
+        return { texto: '-', numero: 0, classe: 'neutral' };
     }
 
     function aplicarFiltroTicker() {
@@ -731,7 +743,6 @@
         }
     });
 
-    // Evento de clique para ordenar ao clicar nos cabeçalhos
     document.querySelectorAll('th.sortable').forEach(th => {
         th.addEventListener('click', () => {
             ordenarTabela(th.dataset.coluna);
@@ -765,10 +776,12 @@
                 const variacaoBruta = acao.variacao ?? undefined;
                 const variacaoPercentualBruta = acao.variacao_percent ?? undefined;
                 
+                // Formata a diária omitindo os parênteses
                 const resultadoDiaria = formatarVariacao(variacaoBruta, variacaoPercentualBruta);
-                const resultadoMensal = extrairValorParenteses(resultadoDiaria.texto);
+                
+                // Extrai o conteúdo dos parênteses para a coluna mensal
+                const resultadoMensal = extrairValorParenteses(acao.variacao, variacaoBruta, variacaoPercentualBruta);
 
-                // Atributos de dados limpos para ordenação numérica
                 tr.dataset.ticker = String(ticker);
                 tr.dataset.preco = preco;
                 tr.dataset.diaria = resultadoDiaria.numero;
