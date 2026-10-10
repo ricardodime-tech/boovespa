@@ -128,6 +128,15 @@
             background: #0f172a;
             color: white;
             font-weight: 700;
+            user-select: none;
+        }
+
+        th.sortable {
+            cursor: pointer;
+        }
+
+        th.sortable:hover {
+            background: #1e293b;
         }
 
         tr:hover {
@@ -276,9 +285,9 @@
             <tr>
                 <th>Ticker</th>
                 <th>Nome</th>
-                <th>Cotação (R$)</th>
-                <th>Variação Diária</th>
-                <th>Variação Mensal</th>
+                <th class="sortable" data-coluna="preco">Cotação (R$) ↕</th>
+                <th class="sortable" data-coluna="diaria">Variação Diária ↕</th>
+                <th class="sortable" data-coluna="mensal">Variação Mensal ↕</th>
             </tr>
         </thead>
         <tbody id="corpo-tabela"></tbody>
@@ -301,6 +310,7 @@
 
 <script>
     const BRAPI_TOKEN = 'sAtztXoEBCxuvHFsvJ4QFr';
+    let ordemAtual = { coluna: null, direcao: 'asc' };
 
     function formatarUltimaAtualizacao() {
         const el = document.getElementById('ultimaAtualizacao');
@@ -314,7 +324,7 @@
             valorBruto === '' ||
             Number(valorBruto) === 0
         ) {
-            return { texto: '-', classe: 'neutral' };
+            return { texto: '-', numero: 0, classe: 'neutral' };
         }
 
         const valor = Number(valorBruto);
@@ -325,23 +335,22 @@
 
         return {
             texto: `${sinal}${valor.toFixed(2)} (${sinal}${percentual.toFixed(2)}%)`,
+            numero: Number(valor.toFixed(2)),
             classe
         };
     }
 
-    // Função auxiliar para extrair o valor de dentro dos parênteses da string de variação diária
     function extrairValorParenteses(variacaoTexto) {
-        if (!variacaoTexto || typeof variacaoTexto !== 'string') return { texto: '-', classe: 'neutral' };
+        if (!variacaoTexto || typeof variacaoTexto !== 'string') return { texto: '-', numero: 0, classe: 'neutral' };
 
         const match = variacaoTexto.match(/\(([^)]+)\)/);
-        if (!match) return { texto: '-', classe: 'neutral' };
+        if (!match) return { texto: '-', numero: 0, classe: 'neutral' };
 
-        // Remove o sinal '%' e espaços para converter em número
         const conteudo = match[1].trim();
         const numeroLimpo = Number(conteudo.replace('%', '').replace('+', '').replace(',', '.'));
 
         if (isNaN(numeroLimpo) || numeroLimpo === 0) {
-            return { texto: conteudo, classe: 'neutral' };
+            return { texto: conteudo, numero: 0, classe: 'neutral' };
         }
 
         const sinal = numeroLimpo > 0 ? '+' : '';
@@ -349,6 +358,7 @@
 
         return {
             texto: `${sinal}${numeroLimpo.toFixed(2)}%`,
+            numero: Number(numeroLimpo.toFixed(2)),
             classe
         };
     }
@@ -363,6 +373,31 @@
 
             linha.style.display = visivel ? '' : 'none';
         });
+    }
+
+    function ordenarTabela(coluna) {
+        const corpoTabela = document.getElementById('corpo-tabela');
+        const linhas = Array.from(corpoTabela.querySelectorAll('tr'));
+
+        if (ordemAtual.coluna === coluna) {
+            ordemAtual.direcao = ordemAtual.direcao === 'asc' ? 'desc' : 'asc';
+        } else {
+            ordemAtual.coluna = coluna;
+            ordemAtual.direcao = 'asc';
+        }
+
+        linhas.sort((a, b) => {
+            let valA = Number(a.dataset[coluna] || 0);
+            let valB = Number(b.dataset[coluna] || 0);
+
+            if (ordemAtual.direcao === 'asc') {
+                return valA - valB;
+            } else {
+                return valB - valA;
+            }
+        });
+
+        linhas.forEach(linha => corpoTabela.appendChild(linha));
     }
 
     function normalizarTicker(ticker) {
@@ -696,6 +731,13 @@
         }
     });
 
+    // Evento de clique para ordenar ao clicar nos cabeçalhos
+    document.querySelectorAll('th.sortable').forEach(th => {
+        th.addEventListener('click', () => {
+            ordenarTabela(th.dataset.coluna);
+        });
+    });
+
     async function carregarAcoes() {
         try {
             const response = await fetch('/api/acoes');
@@ -717,23 +759,25 @@
 
                 const ticker = acao.codigo || acao.sigla || acao.acao || acao.ticker || acao.Ticker || '-';
                 const nome = acao.nome || acao.Nome || acao.empresa || acao.Empresa || '-';
-                const preco = acao.preco_atual ?? acao.Cotacao ?? acao.preco ?? '-';
+                const precoNum = acao.preco_atual ?? acao.Cotacao ?? acao.preco ?? 0;
+                const preco = precoNum !== '-' ? Number(precoNum) : 0;
 
-                // Dados originais de variação
                 const variacaoBruta = acao.variacao ?? undefined;
                 const variacaoPercentualBruta = acao.variacao_percent ?? undefined;
                 
-                // Formata a variação diária normalmente
                 const resultadoDiaria = formatarVariacao(variacaoBruta, variacaoPercentualBruta);
-
-                // Pega o segundo valor (dentro dos parênteses) da variação diária para preencher a mensal
                 const resultadoMensal = extrairValorParenteses(resultadoDiaria.texto);
 
+                // Atributos de dados limpos para ordenação numérica
                 tr.dataset.ticker = String(ticker);
+                tr.dataset.preco = preco;
+                tr.dataset.diaria = resultadoDiaria.numero;
+                tr.dataset.mensal = resultadoMensal.numero;
+
                 tr.innerHTML = `
                     <td><button type="button" class="ticker-btn" data-ticker="${String(ticker).replace(/"/g, '&quot;')}" data-nome="${String(nome).replace(/"/g, '&quot;')}"><strong>${ticker}</strong></button></td>
                     <td>${nome}</td>
-                    <td>${preco !== '-' ? Number(preco).toFixed(2) : '-'}</td>
+                    <td>${preco > 0 ? preco.toFixed(2) : '-'}</td>
                     <td class="${resultadoDiaria.classe}">${resultadoDiaria.texto}</td>
                     <td class="${resultadoMensal.classe}">${resultadoMensal.texto}</td>
                 `;
