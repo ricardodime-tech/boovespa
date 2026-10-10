@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, 1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BOVESPA - Cotações</title>
     <style>
         * {
@@ -277,7 +277,8 @@
                 <th>Ticker</th>
                 <th>Nome</th>
                 <th>Cotação (R$)</th>
-                <th>Variação</th>
+                <th>Variação Diária</th>
+                <th>Variação Mensal</th>
             </tr>
         </thead>
         <tbody id="corpo-tabela"></tbody>
@@ -306,18 +307,18 @@
         el.textContent = `Última atualização: ${new Date().toLocaleString('pt-BR')}`;
     }
 
-    function formatarVariacao(variacao, variacaoPercentual) {
+    function formatarVariacao(valorBruto, percentualBruto) {
         if (
-            variacao === undefined ||
-            variacao === null ||
-            variacao === '' ||
-            Number(variacao) === 0
+            valorBruto === undefined ||
+            valorBruto === null ||
+            valorBruto === '' ||
+            Number(valorBruto) === 0
         ) {
             return { texto: '-', classe: 'neutral' };
         }
 
-        const valor = Number(variacao);
-        const percentual = Number(variacaoPercentual ?? 0);
+        const valor = Number(valorBruto);
+        const percentual = Number(percentualBruto ?? 0);
 
         const sinal = valor > 0 ? '+' : '';
         const classe = valor > 0 ? 'positivo' : valor < 0 ? 'negativo' : 'neutral';
@@ -694,16 +695,23 @@
                 const nome = acao.nome || acao.Nome || acao.empresa || acao.Empresa || '-';
                 const preco = acao.preco_atual ?? acao.Cotacao ?? acao.preco ?? '-';
 
-                const variacao = acao.variacao ?? undefined;
-                const variacaoPercentual = acao.variacao_percent ?? undefined;
-                const resultadoVariacao = formatarVariacao(variacao, variacaoPercentual);
+                // Variação Diária (ajuste as chaves do seu JSON conforme necessário, ex: variacao / variacao_percent)
+                const variacaoDiaria = acao.variacao ?? acao.variacao_diaria ?? undefined;
+                const variacaoDiariaPercent = acao.variacao_percent ?? acao.variacao_diaria_percent ?? undefined;
+                const resultadoDiaria = formatarVariacao(variacaoDiaria, variacaoDiariaPercent);
+
+                // Variação Mensal (ajuste as chaves do seu JSON conforme necessário, ex: variacao_mensal / variacao_mensal_percent)
+                const variacaoMensal = acao.variacao_mensal ?? undefined;
+                const variacaoMensalPercent = acao.variacao_mensal_percent ?? undefined;
+                const resultadoMensal = formatarVariacao(variacaoMensal, variacaoMensalPercent);
 
                 tr.dataset.ticker = String(ticker);
                 tr.innerHTML = `
                     <td><button type="button" class="ticker-btn" data-ticker="${String(ticker).replace(/"/g, '&quot;')}" data-nome="${String(nome).replace(/"/g, '&quot;')}"><strong>${ticker}</strong></button></td>
                     <td>${nome}</td>
                     <td>${preco !== '-' ? Number(preco).toFixed(2) : '-'}</td>
-                    <td class="${resultadoVariacao.classe}">${resultadoVariacao.texto}</td>
+                    <td class="${resultadoDiaria.classe}">${resultadoDiaria.texto}</td>
+                    <td class="${resultadoMensal.classe}">${resultadoMensal.texto}</td>
                 `;
 
                 corpoTabela.appendChild(tr);
