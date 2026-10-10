@@ -1,475 +1,1545 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport" content="width=device-width, 1.0">
+
     <title>BOVESPA - Cotações</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
-        body {
-            background: #eef3f5;
-            color: #1f2937;
+
+        * {
+
+            box-sizing: border-box;
+
         }
+
+
+
+        body {
+
+            font-family: Arial, sans-serif;
+
+            background: #eef3f5;
+
+            margin: 0;
+
+            padding: 20px;
+
+            color: #1f2937;
+
+        }
+
+
+
+        .container {
+
+            max-width: 1100px;
+
+            margin: auto;
+
+            background: #fff;
+
+            padding: 24px;
+
+            border-radius: 12px;
+
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+
+        }
+
+
+
+        .topbar {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 12px;
+
+            margin-bottom: 16px;
+
+            flex-wrap: wrap;
+
+        }
+
+
+
+        h1 {
+
+            margin: 0;
+
+            color: #0f172a;
+
+            font-size: 2rem;
+
+        }
+
+
+
+        .toolbar {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            flex-wrap: wrap;
+
+        }
+
+
+
+        .status {
+
+            font-size: 14px;
+
+            color: #475569;
+
+            background: #f8fafc;
+
+            border: 1px solid #e2e8f0;
+
+            border-radius: 999px;
+
+            padding: 8px 12px;
+
+        }
+
+
+
+        .filtro-ticker {
+
+            padding: 10px 12px;
+
+            border: 1px solid #cbd5e1;
+
+            border-radius: 8px;
+
+            min-width: 200px;
+
+            font-size: 14px;
+
+        }
+
+
+
+        .btn-atualizar {
+
+            background: #004a80;
+
+            color: #fff;
+
+            border: none;
+
+            padding: 10px 18px;
+
+            border-radius: 8px;
+
+            cursor: pointer;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            transition: 0.2s ease;
+
+        }
+
+
+
+        .btn-atualizar:hover {
+
+            background: #003a66;
+
+        }
+
+
+
+        .btn-atualizar:disabled {
+
+            opacity: 0.7;
+
+            cursor: not-allowed;
+
+        }
+
+
+
+        .loading {
+
+            text-align: center;
+
+            font-size: 18px;
+
+            color: #64748b;
+
+            margin-top: 20px;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            gap: 12px;
+
+        }
+
+
+
+        .spinner {
+
+            width: 18px;
+
+            height: 18px;
+
+            border: 3px solid #dbeafe;
+
+            border-top-color: #2563eb;
+
+            border-radius: 50%;
+
+            animation: spin 0.8s linear infinite;
+
+        }
+
+
+
+        @keyframes spin {
+
+            to { transform: rotate(360deg); }
+
+        }
+
+
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            margin-top: 20px;
+
+            overflow: hidden;
+
+            border-radius: 10px;
+
+        }
+
+
+
+        th, td {
+
+            padding: 14px 12px;
+
+            text-align: left;
+
+            border-bottom: 1px solid #e5e7eb;
+
+        }
+
+
+
+        th {
+
+            background: #0f172a;
+
+            color: white;
+
+            font-weight: 700;
+
+        }
+
+
+
+        tr:hover {
+
+            background-color: #f8fafc;
+
+        }
+
+
 
         .positivo {
+
             color: #16a34a;
+
             font-weight: bold;
+
         }
+
+
 
         .negativo {
+
             color: #dc2626;
+
             font-weight: bold;
+
         }
+
+
 
         .neutral {
+
             color: #64748b;
+
             font-weight: bold;
+
         }
 
-        .cursor-pointer {
-            cursor: pointer;
-            user-select: none;
+
+
+        .hidden {
+
+            display: none !important;
+
         }
 
-        .cursor-pointer:hover {
-            background-color: #1e293b !important;
-        }
+
 
         .ticker-btn {
+
             background: transparent;
+
             border: none;
+
             color: #0f172a;
+
             cursor: pointer;
-            font-size: 1rem;
+
+            font-size: 14px;
+
             font-weight: 700;
+
             padding: 0;
+
             text-align: left;
+
         }
+
+
 
         .ticker-btn:hover {
+
             color: #2563eb;
+
             text-decoration: underline;
+
         }
+
+
+
+        .modal {
+
+            position: fixed;
+
+            inset: 0;
+
+            background: rgba(15, 23, 42, 0.7);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            z-index: 1000;
+
+            padding: 20px;
+
+        }
+
+
+
+        .modal-content {
+
+            width: min(900px, 96vw);
+
+            max-height: 90vh;
+
+            background: #fff;
+
+            border-radius: 16px;
+
+            padding: 20px 20px 12px;
+
+            position: relative;
+
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.25);
+
+        }
+
+
+
+        .modal-close {
+
+            position: absolute;
+
+            top: 12px;
+
+            right: 12px;
+
+            border: none;
+
+            background: #f1f5f9;
+
+            color: #0f172a;
+
+            width: 34px;
+
+            height: 34px;
+
+            border-radius: 50%;
+
+            cursor: pointer;
+
+            font-size: 20px;
+
+            line-height: 1;
+
+        }
+
+
+
+        .modal-grafico {
+
+            margin-top: 16px;
+
+            min-height: 420px;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            position: relative;
+
+        }
+
+
+
+        .modal-grafico canvas {
+
+            width: 100%;
+
+            max-height: 72vh;
+
+            border-radius: 10px;
+
+            background: #f8fafc;
+
+        }
+
+
 
         .chart-tooltip {
+
             position: absolute;
+
             pointer-events: none;
+
             background: rgba(15, 23, 42, 0.92);
+
             color: #fff;
+
             border-radius: 8px;
+
             padding: 8px 10px;
+
             font-size: 12px;
+
             line-height: 1.35;
+
             box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+
             transform: translate(12px, 12px);
+
             white-space: nowrap;
-            zIndex: 10;
+
+            z-index: 10;
+
         }
+
+
+
+        .chart-tooltip.hidden {
+
+            display: none;
+
+        }
+
+
+
+        .modal-erro {
+
+            color: #dc2626;
+
+            font-weight: 600;
+
+            text-align: center;
+
+        }
+
     </style>
+
 </head>
-<body class="py-4">
 
-<div class="container bg-white p-4 rounded-4 shadow-sm" style="max-width: 1100px;">
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
-        <h1 class="h2 text-dark m-0 fw-bold">Painel BOVESPA - Ações</h1>
+<body>
 
-        <div class="d-flex align-items-center flex-wrap gap-2">
+
+
+<div class="container">
+
+    <div class="topbar">
+
+        <h1>Painel BOVESPA - Ações</h1>
+
+
+
+        <div class="toolbar">
+
             <input
+
                 id="filtroTicker"
-                class="form-control"
+
+                class="filtro-ticker"
+
                 type="text"
+
                 placeholder="Buscar por ticker..."
+
                 autocomplete="off"
-                style="min-width: 200px;"
+
             >
-            <span id="ultimaAtualizacao" class="badge bg-light text-secondary border px-3 py-2 fs-6">Última atualização: --</span>
-            <button id="btnAtualizarCotacoes" class="btn btn-primary fw-semibold">Atualizar cotações</button>
+
+            <span id="ultimaAtualizacao" class="status">Última atualização: --</span>
+
+            <button id="btnAtualizarCotacoes" class="btn-atualizar">Atualizar cotações</button>
+
         </div>
+
     </div>
 
-    <div id="loading" class="d-flex justify-content-center align-items-center gap-2 text-muted fs-5 my-5">
-        <div class="spinner-border text-primary" role="status" style="width: 1.5rem; height: 1.5rem;"></div>
+
+
+    <div id="loading" class="loading">
+
+        <span class="spinner"></span>
+
         <span>Carregando dados do MongoDB....</span>
+
     </div>
 
-    <div class="table-responsive">
-        <table id="tabela-acoes" class="table table-hover align-middle d-none">
-            <thead class="table-dark">
-                <tr>
-                    <th>Ticker</th>
-                    <th>Nome</th>
-                    <th>Cotação (R$)</th>
-                    <th id="thVariacao" class="cursor-pointer" title="Clique para ordenar por variação">
-                        Variação <i id="iconeOrdenacao" class="bi bi-arrow-down-up small ms-1"></i>
-                    </th>
-                </tr>
-            </thead>
-            <tbody id="corpo-tabela"></tbody>
-        </table>
-    </div>
+
+
+    <table id="tabela-acoes" class="hidden">
+
+        <thead>
+
+            <tr>
+
+                <th>Ticker</th>
+
+                <th>Nome</th>
+
+                <th>Cotação (R$)</th>
+
+                <th>Variação</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody id="corpo-tabela"></tbody>
+
+    </table>
+
 </div>
 
-<!-- Modal -->
-<div id="graficoModal" class="modal fade" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content rounded-4 p-3 shadow-lg">
-            <div class="modal-header border-0 pb-0">
-                <h5 id="modalTitulo" class="modal-title fw-bold">Gráfico do ativo</h5>
-                <button id="fecharModal" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+
+
+<div id="graficoModal" class="modal hidden" aria-hidden="true">
+
+    <div class="modal-content">
+
+        <button id="fecharModal" class="modal-close" type="button" aria-label="Fechar">×</button>
+
+        <h2 id="modalTitulo">Gráfico do ativo</h2>
+
+        <div id="modalGrafico" class="modal-grafico">
+
+            <div class="loading">
+
+                <span class="spinner"></span>
+
+                <span>Carregando gráfico...</span>
+
             </div>
-            <div class="modal-body">
-                <div id="modalGrafico" class="d-flex justify-content-center align-items-center position-relative" style="min-height: 420px;">
-                    <div class="d-flex align-items-center gap-2 text-muted">
-                        <div class="spinner-border text-primary" role="status"></div>
-                        <span>Carregando gráfico...</span>
-                    </div>
-                </div>
-            </div>
+
+            <div id="chartTooltip" class="chart-tooltip hidden"></div>
+
         </div>
+
     </div>
+
 </div>
 
-<!-- Bootstrap JS Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 
 <script>
+
     const BRAPI_TOKEN = 'sAtztXoEBCxuvHFsvJ4QFr';
-    let listaAcoesGlobal = [];
-    let direcaoOrdenacao = 0; // 0: original, 1: descrescente (maior variação primeiro), -1: crescente
+
+
 
     function formatarUltimaAtualizacao() {
+
         const el = document.getElementById('ultimaAtualizacao');
+
         el.textContent = `Última atualização: ${new Date().toLocaleString('pt-BR')}`;
+
     }
+
+
 
     function formatarVariacao(variacao, variacaoPercentual) {
+
         if (
+
             variacao === undefined ||
+
             variacao === null ||
+
             variacao === '' ||
+
             Number(variacao) === 0
+
         ) {
-            return { texto: '-', classe: 'neutral', valorNumerico: 0 };
+
+            return { texto: '-', classe: 'neutral' };
+
         }
+
+
 
         const valor = Number(variacao);
+
         const percentual = Number(variacaoPercentual ?? 0);
 
+
+
         const sinal = valor > 0 ? '+' : '';
+
         const classe = valor > 0 ? 'positivo' : valor < 0 ? 'negativo' : 'neutral';
 
+
+
         return {
+
             texto: `${sinal}${valor.toFixed(2)} (${sinal}${percentual.toFixed(2)}%)`,
-            classe,
-            valorNumerico: percentual // Usando o percentual como base de ordenação
+
+            classe
+
         };
+
     }
+
+
 
     function aplicarFiltroTicker() {
+
         const filtro = document.getElementById('filtroTicker').value.trim().toUpperCase();
+
         const linhas = document.querySelectorAll('#corpo-tabela tr');
 
+
+
         linhas.forEach((linha) => {
+
             const ticker = (linha.dataset.ticker || '').toUpperCase();
+
             const visivel = !filtro || ticker.includes(filtro);
+
+
+
             linha.style.display = visivel ? '' : 'none';
+
         });
+
     }
+
+
 
     function normalizarTicker(ticker) {
+
         return String(ticker || '').trim().replace(/\.SA$/i, '').replace(/\s+/g, '').toUpperCase();
+
     }
+
+
 
     function extrairValorPreco(item) {
+
         if (typeof item === 'number') return Number(item);
+
         if (!item || typeof item !== 'object') return null;
+
+
 
         const candidatos = [
-            item.close, item.price, item.value, item.priceClose,
-            item.adjclose, item.last, item.regularMarketPrice, item.prevClose, item.closePrice
+
+            item.close,
+
+            item.price,
+
+            item.value,
+
+            item.priceClose,
+
+            item.adjclose,
+
+            item.last,
+
+            item.regularMarketPrice,
+
+            item.prevClose,
+
+            item.closePrice
+
         ];
 
+
+
         for (const valor of candidatos) {
+
             const numero = Number(valor);
+
             if (Number.isFinite(numero) && numero > 0) return numero;
+
         }
+
+
+
         return null;
+
     }
+
+
 
     function extrairDataHistorico(item) {
+
         if (!item || typeof item !== 'object') return null;
+
         return item.date || item.datetime || item.timestamp || item.time || item.day || item.period;
+
     }
+
+
 
     function converterHistoricoEmPontos(historico) {
+
         if (!Array.isArray(historico)) return [];
+
+
+
         return historico
+
             .map((item) => {
+
                 const valor = extrairValorPreco(item);
+
                 const data = extrairDataHistorico(item);
-                if (!Number.isFinite(valor) || valor <= 0 || !data) return null;
-                return { valor, data };
+
+
+
+                if (!Number.isFinite(valor) || valor <= 0 || !data) {
+
+                    return null;
+
+                }
+
+
+
+                return {
+
+                    valor,
+
+                    data
+
+                };
+
             })
+
             .filter(Boolean)
+
             .slice(-120);
+
     }
+
+
 
     function desenharGrafico(canvas, pontos, ticker, precoAtual = null, nomeAtivo = '') {
+
         const ctx = canvas.getContext('2d');
+
         const width = canvas.width;
+
         const height = canvas.height;
 
+
+
         ctx.clearRect(0, 0, width, height);
+
         ctx.fillStyle = '#f4f7f9';
+
         ctx.fillRect(0, 0, width, height);
 
+
+
         const simbolo = normalizarTicker(ticker);
+
         const nomeExibicao = nomeAtivo || simbolo || 'Ativo';
-        const valorAtual = Number(precoAtual ?? pontos[pontos.length - 1]?.valor ?? 0);
+
+        const valorAtual = Number(precoAtual ?? pontos[pontos.length
+1]?.valor ?? 0);
+
         const minValor = Math.min(...pontos.map((p) => p.valor));
+
         const maxValor = Math.max(...pontos.map((p) => p.valor));
 
+
+
         const padding = { top: 82, right: 22, bottom: 55, left: 66 };
-        const plotWidth = width - padding.left - padding.right;
-        const plotHeight = height - padding.top - padding.bottom;
+
+        const plotWidth = width
+padding.left
+padding.right;
+
+        const plotHeight = height
+padding.top
+padding.bottom;
+
+
 
         const coordenadas = pontos.map((ponto, indice) => {
-            const x = padding.left + (plotWidth * indice) / Math.max(1, pontos.length - 1);
-            const y = padding.top + ((maxValor - ponto.valor) / (maxValor - minValor || 1)) * plotHeight;
+
+            const x = padding.left + (plotWidth
+indice) / Math.max(1, pontos.length
+1);
+
+            const y = padding.top + ((maxValor
+ponto.valor) / (maxValor
+minValor || 1)) * plotHeight;
+
             return { ...ponto, x, y };
+
         });
+
+
 
         ctx.fillStyle = '#1f2937';
+
         ctx.textAlign = 'left';
+
         ctx.font = '700 20px Arial';
+
         ctx.fillText(nomeExibicao, padding.left, 30);
 
+
+
         ctx.fillStyle = '#0f9f6e';
+
         ctx.font = '700 24px Arial';
+
         ctx.fillText(`R$ ${valorAtual.toFixed(2)}`, padding.left, 62);
 
-        // Grid e linhas de eixo omitidas por brevidade, mantendo funcionalidade...
-        // Linha principal do gráfico
-        ctx.beginPath();
+
+
+        const legendX = width
+180;
+
+        const legendY = 22;
+
+        ctx.fillStyle = '#e5edf4';
+
+        ctx.fillRect(legendX
+8, legendY
+10, 154, 22);
+
+
+
         ctx.strokeStyle = '#2563eb';
-        ctx.lineWidth = 2.5;
-        coordenadas.forEach((ponto, indice) => {
-            if (indice === 0) ctx.moveTo(ponto.x, ponto.y);
-            else ctx.lineTo(ponto.x, ponto.y);
-        });
+
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+
+        ctx.moveTo(legendX, legendY + 2);
+
+        ctx.lineTo(legendX + 22, legendY + 2);
+
         ctx.stroke();
 
-        const canvasEl = canvas;
-        const modal = canvasEl.closest('.modal-body');
-        let tooltip = modal ? modal.querySelector('#chartTooltip') : null;
 
-        if (!tooltip) {
-            tooltip = document.createElement('div');
-            tooltip.id = 'chartTooltip';
-            tooltip.className = 'chart-tooltip hidden';
-            if (modal) modal.appendChild(tooltip);
+
+        ctx.fillStyle = '#334155';
+
+        ctx.font = '12px Arial';
+
+        ctx.textAlign = 'left';
+
+        ctx.fillText('Preço de Fechamento', legendX + 30, legendY + 6);
+
+
+
+        ctx.strokeStyle = '#dfe7f0';
+
+        ctx.lineWidth = 1;
+
+        for (let i = 0; i <= 5; i++) {
+
+            const y = padding.top + (plotHeight / 5) * i;
+
+            ctx.beginPath();
+
+            ctx.moveTo(padding.left, y);
+
+            ctx.lineTo(width
+padding.right, y);
+
+            ctx.stroke();
+
         }
 
-        canvasEl.onmousemove = (event) => {
-            const rect = canvasEl.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
 
-            let pontoMaisProximo = null;
-            let menorDistancia = Number.POSITIVE_INFINITY;
 
-            coordenadas.forEach((ponto) => {
-                const distancia = Math.hypot(x - ponto.x, y - ponto.y);
-                if (distancia < menorDistancia) {
-                    menorDistancia = distancia;
-                    pontoMaisProximo = ponto;
-                }
-            });
+        for (let i = 0; i <= 8; i++) {
 
-            if (!pontoMaisProximo || menorDistancia > 28) {
-                tooltip?.classList.add('hidden');
-                return;
-            }
+            const x = padding.left + (plotWidth / 8) * i;
 
-            const data = new Date((Number(pontoMaisProximo.data) || Date.now()) * 1000);
-            tooltip.innerHTML = `<strong>R$ ${Number(pontoMaisProximo.valor).toFixed(2)}</strong><br>${data.toLocaleDateString('pt-BR')}`;
-            tooltip.style.left = `${Math.min(x + 12, rect.width - 120)}px`;
-            tooltip.style.top = `${Math.max(y - 40, 8)}px`;
-            tooltip.classList.remove('hidden');
-        };
+            ctx.beginPath();
 
-        canvasEl.onmouseleave = () => {
-            tooltip?.classList.add('hidden');
-        };
-    }
+            ctx.moveTo(x, padding.top);
 
-    async function carregarGraficoAtivo(ticker) {
-        const modalTitulo = document.getElementById('modalTitulo');
-        const modalGrafico = document.getElementById('modalGrafico');
-        const simbolo = normalizarTicker(ticker);
+            ctx.lineTo(x, height
+padding.bottom);
 
-        modalTitulo.textContent = `Gráfico de ${simbolo}`;
-        modalGrafico.innerHTML = `
-            <div class="d-flex align-items-center gap-2 text-muted">
-                <div class="spinner-border text-primary" role="status"></div>
-                <span>Carregando gráfico...</span>
-            </div>
-        `;
+            ctx.stroke();
 
-        try {
-            const ranges = ['3mo', '1mo', '5d', '1d'];
-            let historico = [];
-            let ultimoPreco = null;
-            let nomeAtivo = '';
-
-            for (const range of ranges) {
-                const response = await fetch(`https://brapi.dev/api/quote/${encodeURIComponent(simbolo)}?range=${range}&interval=1d&token=${BRAPI_TOKEN}`);
-                const data = await response.json();
-
-                if (data?.error) continue;
-
-                const resultado = data?.results?.[0] || data?.data?.[0] || data;
-                nomeAtivo = resultado?.longName || resultado?.shortName || nomeAtivo || simbolo;
-                ultimoPreco = Number(resultado?.regularMarketPrice ?? resultado?.price ?? 0);
-
-                historico = converterHistoricoEmPontos(
-                    resultado?.historicalDataPrice || resultado?.historical || resultado?.history || []
-                );
-
-                if (historico.length) break;
-            }
-
-            if (!historico.length) throw new Error('Nenhum dado histórico disponível.');
-
-            const canvas = document.createElement('canvas');
-            canvas.width = 900;
-            canvas.height = 420;
-            canvas.style.width = '100%';
-            canvas.style.height = 'auto';
-            canvas.style.borderRadius = '8px';
-
-            modalGrafico.innerHTML = '';
-            modalGrafico.appendChild(canvas);
-
-            desenharGrafico(canvas, historico, simbolo, ultimoPreco || historico[historico.length - 1]?.valor, nomeAtivo);
-        } catch (error) {
-            modalGrafico.innerHTML = `<div class="text-danger fw-semibold text-center">Não foi possível carregar o gráfico de ${simbolo}.</div>`;
         }
-    }
 
-    function renderizarTabela(acoes) {
-        const corpoTabela = document.getElementById('corpo-tabela');
-        corpoTabela.innerHTML = '';
 
-        acoes.forEach((acao) => {
-            const tr = document.createElement('tr');
-            const ticker = acao.codigo || acao.sigla || acao.acao || acao.ticker || acao.Ticker || '-';
-            const nome = acao.nome || acao.Nome || acao.empresa || acao.Empresa || '-';
-            const preco = acao.preco_atual ?? acao.Cotacao ?? acao.preco ?? '-';
 
-            const variacao = acao.variacao ?? undefined;
-            const variacaoPercentual = acao.variacao_percent ?? undefined;
-            const resultadoVariacao = formatarVariacao(variacao, variacaoPercentual);
+        ctx.strokeStyle = '#aab7c6';
 
-            tr.dataset.ticker = String(ticker);
-            tr.innerHTML = `
-                <td><button type="button" class="ticker-btn" data-ticker="${String(ticker).replace(/"/g, '&quot;')}" data-nome="${String(nome).replace(/"/g, '&quot;')}"><strong>${ticker}</strong></button></td>
-                <td>${nome}</td>
-                <td>${preco !== '-' ? Number(preco).toFixed(2) : '-'}</td>
-                <td class="${resultadoVariacao.classe}">${resultadoVariacao.texto}</td>
-            `;
-            corpoTabela.appendChild(tr);
+        ctx.beginPath();
+
+        ctx.moveTo(padding.left, padding.top);
+
+        ctx.lineTo(padding.left, height
+padding.bottom);
+
+        ctx.lineTo(width
+padding.right, height
+padding.bottom);
+
+        ctx.stroke();
+
+
+
+        ctx.fillStyle = '#475569';
+
+        ctx.font = '12px Arial';
+
+        ctx.textAlign = 'right';
+
+        for (let i = 0; i <= 5; i++) {
+
+            const valor = maxValor((
+maxValor
+minValor) / 5) * i;
+
+            const y = padding.top + (plotHeight / 5) * i;
+
+            ctx.fillText(`R$ ${valor.toFixed(2)}`, padding.left
+8, y + 4);
+
+        }
+
+
+
+        ctx.beginPath();
+
+        ctx.strokeStyle = '#2563eb';
+
+        ctx.lineWidth = 2.5;
+
+        coordenadas.forEach((ponto, indice) => {
+
+            if (indice === 0) {
+
+                ctx.moveTo(ponto.x, ponto.y);
+
+            } else {
+
+                ctx.lineTo(ponto.x, ponto.y);
+
+            }
+
         });
 
-        document.getElementById('loading').classList.add('d-none');
-        document.getElementById('tabela-acoes').classList.remove('d-none');
-        formatarUltimaAtualizacao();
-        aplicarFiltroTicker();
-    }
+        ctx.stroke();
 
-    async function carregarAcoes() {
-        try {
-            const response = await fetch('/api/acoes');
-            const acoes = await response.json();
 
-            if (!Array.isArray(acoes) || acoes.length === 0) {
-                document.getElementById('loading').innerHTML = 'Nenhum dado encontrado na coleção.';
-                return;
+
+        coordenadas.forEach((ponto) => {
+
+            ctx.fillStyle = '#ffffff';
+
+            ctx.beginPath();
+
+            ctx.arc(ponto.x, ponto.y, 4, 0, Math.PI
+2);
+
+            ctx.fill();
+
+            ctx.strokeStyle = '#2563eb';
+
+            ctx.lineWidth = 2;
+
+            ctx.stroke();
+
+        });
+
+
+
+        ctx.fillStyle = '#475569';
+
+        ctx.font = '11px Arial';
+
+        ctx.textAlign = 'center';
+
+        const labelsCount = 8;
+
+        const step = Math.max(1, Math.floor((pontos.length
+1) / labelsCount));
+
+        for (let i = 0; i < pontos.length; i += step) {
+
+            const ponto = pontos[i];
+
+            const x = padding.left + (plotWidth
+i) / Math.max(1, pontos.length
+1);
+
+            const data = new Date((Number(ponto.data) || Date.now()) * 1000);
+
+            const texto = data.toLocaleDateString('pt-BR', { month: '2-digit', year: '2-digit' });
+
+            ctx.fillText(texto, x, height
+18);
+
+        }
+
+
+
+        const canvasEl = canvas;
+
+        const modal = canvasEl.closest('.modal-grafico');
+
+        let tooltip = modal ? modal.querySelector('#chartTooltip') : null;
+
+
+
+        if (!tooltip) {
+
+            tooltip = document.createElement('div');
+
+            tooltip.id = 'chartTooltip';
+
+            tooltip.className = 'chart-tooltip hidden';
+
+            if (modal) {
+
+                modal.appendChild(tooltip);
+
             }
 
-            listaAcoesGlobal = acoes;
-            renderizarTabela(listaAcoesGlobal);
-        } catch (error) {
-            document.getElementById('loading').innerHTML = 'Erro ao carregar os dados.';
         }
+
+
+
+        canvasEl.onmousemove = (event) => {
+
+            const rect = canvasEl.getBoundingClientRect();
+
+            const x = event.clientX
+rect.left;
+
+            const y = event.clientY
+rect.top;
+
+
+
+            let pontoMaisProximo = null;
+
+            let menorDistancia = Number.POSITIVE_INFINITY;
+
+
+
+            coordenadas.forEach((ponto) => {
+
+                const distancia = Math.hypot(x
+ponto.x, y
+ponto.y);
+
+                if (distancia < menorDistancia) {
+
+                    menorDistancia = distancia;
+
+                    pontoMaisProximo = ponto;
+
+                }
+
+            });
+
+
+
+            if (!pontoMaisProximo || menorDistancia > 28) {
+
+                tooltip?.classList.add('hidden');
+
+                return;
+
+            }
+
+
+
+            const data = new Date((Number(pontoMaisProximo.data) || Date.now()) * 1000);
+
+            tooltip.innerHTML = `
+
+                <strong>R$ ${Number(pontoMaisProximo.valor).toFixed(2)}</strong><br>
+
+                ${data.toLocaleDateString('pt-BR')}
+
+            `;
+
+            tooltip.style.left = `${Math.min(x + 12, rect.width
+120)}px`;
+
+            tooltip.style.top = `${Math.max(y
+40, 8)}px`;
+
+            tooltip.classList.remove('hidden');
+
+        };
+
+
+
+        canvasEl.onmouseleave = () => {
+
+            tooltip?.classList.add('hidden');
+
+        };
+
     }
 
-    // Ordenação por Variação
-    document.getElementById('thVariacao').addEventListener('click', () => {
-        direcaoOrdenacao = (direcaoOrdenacao + 2) % 3 - 1; // Alterna entre 1 (desc), -1 (asc), e 0 (original)
-        const icone = document.getElementById('iconeOrdenacao');
 
-        let acoesOrdenadas = [...listaAcoesGlobal];
 
-        if (direcaoOrdenacao === 1) {
-            icone.className = 'bi bi-arrow-up text-primary small ms-1';
-            acoesOrdenadas.sort((a, b) => {
-                const varA = Number(a.variacao_percent ?? a.variacao ?? 0);
-                const varB = Number(b.variacao_percent ?? b.variacao ?? 0);
-                return varB - varA; // Maior alta primeiro
-            });
-        } else if (direcaoOrdenacao === -1) {
-            icone.className = 'bi bi-arrow-down text-primary small ms-1';
-            acoesOrdenadas.sort((a, b) => {
-                const varA = Number(a.variacao_percent ?? a.variacao ?? 0);
-                const varB = Number(b.variacao_percent ?? b.variacao ?? 0);
-                return varA - varB; // Menor variação / queda primeiro
-            });
-        } else {
-            icone.className = 'bi bi-arrow-down-up small ms-1';
+    async function carregarGraficoAtivo(ticker) {
+
+        const modalTitulo = document.getElementById('modalTitulo');
+
+        const modalGrafico = document.getElementById('modalGrafico');
+
+        const simbolo = normalizarTicker(ticker);
+
+
+
+        modalTitulo.textContent = `Gráfico de ${simbolo}`;
+
+        modalGrafico.innerHTML = `
+
+            <div class="loading">
+
+                <span class="spinner"></span>
+
+                <span>Carregando gráfico...</span>
+
+            </div>
+
+            <div id="chartTooltip" class="chart-tooltip hidden"></div>
+
+        `;
+
+
+
+        try {
+
+            const ranges = ['3mo', '1mo', '5d', '1d'];
+
+            let historico = [];
+
+            let ultimoErro = null;
+
+            let ultimoPreco = null;
+
+            let nomeAtivo = '';
+
+
+
+            for (const range of ranges) {
+
+                try {
+
+                    const response = await fetch(`https://brapi.dev/api/quote/${encodeURIComponent(simbolo)}?range=${range}&interval=1d&token=${BRAPI_TOKEN}`);
+
+                    const data = await response.json();
+
+
+
+                    if (data?.error) {
+
+                        ultimoErro = data;
+
+                        continue;
+
+                    }
+
+
+
+                    const resultado = data?.results?.[0] || data?.data?.[0] || data;
+
+                    nomeAtivo = resultado?.longName || resultado?.shortName || nomeAtivo || simbolo;
+
+                    ultimoPreco = Number(resultado?.regularMarketPrice ?? resultado?.price ?? 0);
+
+
+
+                    historico = converterHistoricoEmPontos(
+
+                        resultado?.historicalDataPrice ||
+
+                        resultado?.historical ||
+
+                        resultado?.history ||
+
+                        data?.historicalDataPrice ||
+
+                        data?.historical ||
+
+                        []
+
+                    );
+
+
+
+                    if (historico.length) {
+
+                        break;
+
+                    }
+
+                } catch (error) {
+
+                    ultimoErro = error;
+
+                }
+
+            }
+
+
+
+            if (!historico.length) {
+
+                throw new Error(ultimoErro?.message || 'Nenhum dado histórico disponível para este ativo.');
+
+            }
+
+
+
+            const canvas = document.createElement('canvas');
+
+            canvas.width = 1100;
+
+            canvas.height = 420;
+
+            modalGrafico.innerHTML = '';
+
+            modalGrafico.appendChild(canvas);
+
+            const tooltip = document.createElement('div');
+
+            tooltip.id = 'chartTooltip';
+
+            tooltip.className = 'chart-tooltip hidden';
+
+            modalGrafico.appendChild(tooltip);
+
+            desenharGrafico(canvas, historico, simbolo, ultimoPreco || historico[historico.length
+1]?.valor, nomeAtivo);
+
+        } catch (error) {
+
+            console.error('Erro ao carregar gráfico do ativo:', error);
+
+            modalGrafico.innerHTML = `
+
+                <div class="modal-erro">
+
+                    Não foi possível carregar o gráfico de ${simbolo}.<br>
+
+                    Tente novamente mais tarde.
+
+                </div>
+
+            `;
+
         }
 
-        renderizarTabela(acoesOrdenadas);
-    });
+    }
+
+
+
+    function abrirModalTicker(ticker, nome = '') {
+
+        const modal = document.getElementById('graficoModal');
+
+        const titulo = document.getElementById('modalTitulo');
+
+
+
+        titulo.textContent = `${normalizarTicker(ticker)}${nome ? ` - ${nome}` : ''}`;
+
+        modal.classList.remove('hidden');
+
+        modal.setAttribute('aria-hidden', 'false');
+
+        carregarGraficoAtivo(ticker);
+
+    }
+
+
+
+    function fecharModalTicker() {
+
+        const modal = document.getElementById('graficoModal');
+
+        modal.classList.add('hidden');
+
+        modal.setAttribute('aria-hidden', 'true');
+
+    }
+
+
 
     document.getElementById('corpo-tabela').addEventListener('click', (event) => {
+
         const botaoTicker = event.target.closest('.ticker-btn');
+
         if (!botaoTicker) return;
 
-        const modalEl = document.getElementById('graficoModal');
-        const modal = new bootstrap.Modal(modalEl);
-        modal.show();
-        carregarGraficoAtivo(botaoTicker.dataset.ticker);
+
+
+        abrirModalTicker(botaoTicker.dataset.ticker, botaoTicker.dataset.nome);
+
     });
+
+
+
+    document.getElementById('fecharModal').addEventListener('click', fecharModalTicker);
+
+
+
+    document.getElementById('graficoModal').addEventListener('click', (event) => {
+
+        if (event.target === event.currentTarget) {
+
+            fecharModalTicker();
+
+        }
+
+    });
+
+
+
+    async function carregarAcoes() {
+
+        try {
+
+            const response = await fetch('/api/acoes');
+
+            const acoes = await response.json();
+
+
+
+            const corpoTabela = document.getElementById('corpo-tabela');
+
+            const loading = document.getElementById('loading');
+
+            const tabela = document.getElementById('tabela-acoes');
+
+
+
+            corpoTabela.innerHTML = '';
+
+
+
+            if (!Array.isArray(acoes) || acoes.length === 0) {
+
+                loading.innerHTML = 'Nenhum dado encontrado na coleção.';
+
+                return;
+
+            }
+
+
+
+            acoes.forEach((acao) => {
+
+                const tr = document.createElement('tr');
+
+
+
+                const ticker = acao.codigo || acao.sigla || acao.acao || acao.ticker || acao.Ticker || '-';
+
+                const nome = acao.nome || acao.Nome || acao.empresa || acao.Empresa || '-';
+
+                const preco = acao.preco_atual ?? acao.Cotacao ?? acao.preco ?? '-';
+
+
+
+                const variacao = acao.variacao ?? undefined;
+
+                const variacaoPercentual = acao.variacao_percent ?? undefined;
+
+                const resultadoVariacao = formatarVariacao(variacao, variacaoPercentual);
+
+
+
+                tr.dataset.ticker = String(ticker);
+
+                tr.innerHTML = `
+
+                    <td><button type="button" class="ticker-btn" data-ticker="${String(ticker).replace(/"/g, '&quot;')}" data-nome="${String(nome).replace(/"/g, '&quot;')}"><strong>${ticker}</strong></button></td>
+
+                    <td>${nome}</td>
+
+                    <td>${preco !== '-' ? Number(preco).toFixed(2) : '-'}</td>
+
+                    <td class="${resultadoVariacao.classe}">${resultadoVariacao.texto}</td>
+
+                `;
+
+
+
+                corpoTabela.appendChild(tr);
+
+            });
+
+
+
+            loading.classList.add('hidden');
+
+            tabela.classList.remove('hidden');
+
+            formatarUltimaAtualizacao();
+
+            aplicarFiltroTicker();
+
+        } catch (error) {
+
+            console.error('Erro ao carregar tabela:', error);
+
+            document.getElementById('loading').innerHTML = 'Erro ao carregar os dados.';
+
+        }
+
+    }
+
+
 
     document.getElementById('filtroTicker').addEventListener('input', aplicarFiltroTicker);
 
+
+
     document.getElementById('btnAtualizarCotacoes').addEventListener('click', async () => {
+
         const btn = document.getElementById('btnAtualizarCotacoes');
+
+
+
         btn.disabled = true;
+
         btn.textContent = 'Atualizando...';
 
+
+
         try {
+
             const response = await fetch('/api/acoes', {
+
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
+
+                headers: {
+
+                    'Content-Type': 'application/json'
+
+                }
+
             });
+
+
+
             const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'Erro ao atualizar');
+
+
+
+            if (!response.ok) {
+
+                throw new Error(data.error || 'Erro ao atualizar');
+
+            }
+
+
+
             await carregarAcoes();
+
         } catch (error) {
+
             alert(error.message);
+
         } finally {
+
             btn.disabled = false;
+
             btn.textContent = 'Atualizar cotações';
+
         }
+
     });
 
+
+
     carregarAcoes();
+
 </script>
 
+
+
 </body>
-</html>
+
+</html> 
