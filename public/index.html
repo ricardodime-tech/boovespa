@@ -30,15 +30,29 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 16px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            height: 150px;
+            width: auto;
+            object-fit: contain;
         }
 
         h1 {
             margin: 0;
-            color: #0f172a;
+            /* Título com letras douradas */
+            color: #d4af37;
             font-size: 2rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         .toolbar {
@@ -260,7 +274,10 @@
 
 <div class="container">
     <div class="topbar">
-        <h1>Painel BOVESPA - Ações</h1>
+        <div class="header-left">
+            <img src="logo.png" alt="Logo" class="logo">
+            <h1>Painel BOVESPA - Ações</h1>
+        </div>
 
         <div class="toolbar">
             <input
@@ -286,7 +303,7 @@
                 <th>Ticker</th>
                 <th>Nome</th>
                 <th class="sortable" data-coluna="preco">Cotação (R$) ↕</th>
-                <th class="sortable" data-coluna="diaria">Variação R$ ↕</th>
+                <th class="sortable" data-coluna="diaria">Variação Diária ↕</th>
                 <th class="sortable" data-coluna="mensal">Variação Mensal ↕</th>
             </tr>
         </thead>
@@ -334,7 +351,6 @@
         const classe = valor > 0 ? 'positivo' : valor < 0 ? 'negativo' : 'neutral';
 
         return {
-            // Omitido o percentual entre parênteses, mostrando apenas o valor principal
             texto: `${sinal}${valor.toFixed(2)}`,
             numero: Number(valor.toFixed(2)),
             classe
@@ -342,7 +358,6 @@
     }
 
     function extrairValorParenteses(variacaoTextoOriginal, valorBruto, percentualBruto) {
-        // Tenta extrair o parêntese do dado original, se existir
         if (variacaoTextoOriginal && typeof variacaoTextoOriginal === 'string') {
             const match = variacaoTextoOriginal.match(/\(([^)]+)\)/);
             if (match) {
@@ -360,7 +375,6 @@
             }
         }
 
-        // Alternativa caso venha separado por propriedades individuais (ex: variacao_percent)
         const percentual = Number(percentualBruto ?? 0);
         if (Number.isFinite(percentual) && percentual !== 0) {
             const sinal = percentual > 0 ? '+' : '';
@@ -776,10 +790,7 @@
                 const variacaoBruta = acao.variacao ?? undefined;
                 const variacaoPercentualBruta = acao.variacao_percent ?? undefined;
                 
-                // Formata a diária omitindo os parênteses
                 const resultadoDiaria = formatarVariacao(variacaoBruta, variacaoPercentualBruta);
-                
-                // Extrai o conteúdo dos parênteses para a coluna mensal
                 const resultadoMensal = extrairValorParenteses(acao.variacao, variacaoBruta, variacaoPercentualBruta);
 
                 tr.dataset.ticker = String(ticker);
