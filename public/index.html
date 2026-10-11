@@ -36,27 +36,33 @@
         }
 
         .topbar {
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
             align-items: center;
             gap: 20px;
             margin-bottom: 20px;
-            flex-wrap: wrap;
         }
 
         .header-left {
             display: flex;
             align-items: center;
-            gap: 24px;
+            gap: 16px;
         }
 
         .logo {
-            height: 90px; /* Altura ideal para o brasão ficar proporcional e centralizado com o texto */
+            height: 90px;
             width: auto;
             object-fit: contain;
         }
 
-        /* Título em Letras Douradas com Gradiente suave e centralizado verticalmente com a logo */
+        /* Título centralizado na linha de forma absoluta/flexível */
+        .header-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
         h1 {
             margin: 0;
             font-family: 'Montserrat', -apple-system, sans-serif;
@@ -78,6 +84,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            justify-content: flex-end;
             flex-wrap: wrap;
         }
 
@@ -348,17 +355,35 @@
             font-weight: 600;
             text-align: center;
         }
+
+        /* Responsividade para telas menores */
+        @media (max-width: 900px) {
+            .topbar {
+                grid-template-columns: 1fr;
+                justify-items: center;
+                text-align: center;
+            }
+            .toolbar {
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="topbar">
+        <!-- Logo à esquerda -->
         <div class="header-left">
             <img src="logo.png" alt="Logo" class="logo">
+        </div>
+
+        <!-- Título perfeitamente centralizado no meio da linha -->
+        <div class="header-center">
             <h1>Painel BOVESPA - Ações</h1>
         </div>
 
+        <!-- Ferramentas à direita -->
         <div class="toolbar">
             <div class="search-box">
                 <svg viewBox="0 0 24 24"><path d="M21.71 20.29l-5.002-5.002C17.824 13.57 18.5 11.858 18.5 10c0-4.687-3.813-8.5-8.5-8.5S1.5 5.313 1.5 10s3.813 8.5 8.5 8.5c1.858 0 3.57-.676 5.288-1.788l5.002 5.002c.39.39 1.024.39 1.414 0 .39-.39.39-1.024 0-1.424zM10 16.5c-3.59 0-6.5-2.91-6.5-6.5s2.91-6.5 6.5-6.5 6.5 2.91 6.5 6.5-2.91 6.5-6.5 6.5z"/></svg>
