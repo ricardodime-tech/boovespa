@@ -36,17 +36,18 @@
         }
 
         .topbar {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
             gap: 20px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
+            position: relative;
         }
 
         .header-left {
             display: flex;
             align-items: center;
-            gap: 16px;
         }
 
         .logo {
@@ -55,20 +56,17 @@
             object-fit: contain;
         }
 
-        /* Título centralizado na linha de forma absoluta/flexível */
-        .header-center {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-
-        h1 {
+        /* Título centralizado de forma absoluta no meio da barra superior, mantendo a logo à esquerda */
+        .topbar h1 {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
             margin: 0;
             font-family: 'Montserrat', -apple-system, sans-serif;
-            font-size: 2.3rem;
+            font-size: 2.2rem;
             font-weight: 700;
             letter-spacing: -0.3px;
+            white-space: nowrap;
             
             /* Gradiente dourado suave */
             background: linear-gradient(135deg, #a17c2a 0%, #c99a2c 50%, #8c6418 100%);
@@ -84,8 +82,8 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            justify-content: flex-end;
             flex-wrap: wrap;
+            margin-left: auto;
         }
 
         .status {
@@ -357,13 +355,15 @@
         }
 
         /* Responsividade para telas menores */
-        @media (max-width: 900px) {
-            .topbar {
-                grid-template-columns: 1fr;
-                justify-items: center;
+        @media (max-width: 1024px) {
+            .topbar h1 {
+                position: static;
+                transform: none;
                 text-align: center;
+                width: 100%;
+                order: 3;
             }
-            .toolbar {
+            .topbar {
                 justify-content: center;
             }
         }
@@ -373,15 +373,13 @@
 
 <div class="container">
     <div class="topbar">
-        <!-- Logo à esquerda -->
+        <!-- Logo fixa à esquerda -->
         <div class="header-left">
             <img src="logo.png" alt="Logo" class="logo">
         </div>
 
-        <!-- Título perfeitamente centralizado no meio da linha -->
-        <div class="header-center">
-            <h1>Painel BOVESPA - Ações</h1>
-        </div>
+        <!-- Título centralizado exatamente no meio da barra -->
+        <h1>Painel BOVESPA - Ações</h1>
 
         <!-- Ferramentas à direita -->
         <div class="toolbar">
