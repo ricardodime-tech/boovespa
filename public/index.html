@@ -389,7 +389,7 @@
             <div></div> <!-- Espaçador para equilibrar o grid -->
         </div>
 
-        <!-- Linha Inferior: Barra de ferramentas (Busca, Status, Botão) -->
+        <!-- Linha Inferior: Barra de ferramentas (Busca, Limpar Filtro, Status, Botão) -->
         <div class="toolbar">
             <div class="search-box">
                 <svg viewBox="0 0 24 24"><path d="M21.71 20.29l-5.002-5.002C17.824 13.57 18.5 11.858 18.5 10c0-4.687-3.813-8.5-8.5-8.5S1.5 5.313 1.5 10s3.813 8.5 8.5 8.5c1.858 0 3.57-.676 5.288-1.788l5.002 5.002c.39.39 1.024.39 1.414 0 .39-.39.39-1.024 0-1.424zM10 16.5c-3.59 0-6.5-2.91-6.5-6.5s2.91-6.5 6.5-6.5 6.5 2.91 6.5 6.5-2.91 6.5-6.5 6.5z"/></svg>
@@ -401,6 +401,12 @@
                     autocomplete="off"
                 >
             </div>
+
+            <!-- Botão Limpar Filtro com ícone de borracha -->
+            <button id="btnLimparFiltro" class="btn btn-cinza" title="Limpar busca e ordenação">
+                <svg viewBox="0 0 24 24"><path d="M15.14 3.29c.39-.39 1.02-.39 1.41 0l4.16 4.16c.39.39.39 1.02 0 1.41l-11.5 11.5c-.39.39-1.02.39-1.41 0l-4.16-4.16c-.39-.39-.39-1.02 0-1.41l11.5-11.5zM2 20h20v2H2v-2z"/></svg>
+                Limpar Filtro
+            </button>
             
             <span id="ultimaAtualizacao" class="status">Última atualização: --</span>
             
@@ -447,6 +453,7 @@
 <script>
     const BRAPI_TOKEN = 'sAtztXoEBCxuvHFsvJ4QFr';
     let ordemAtual = { coluna: null, direcao: 'asc' };
+    let dadosOriginaisAcoes = []; // Array auxiliar para resetar a ordenação para o padrão original
 
     function formatarUltimaAtualizacao() {
         const el = document.getElementById('ultimaAtualizacao');
@@ -542,6 +549,42 @@
         });
 
         linhas.forEach(linha => corpoTabela.appendChild(linha));
+    }
+
+    // Função para renderizar a tabela com base em um array de dados
+    function preencherTabela(acoes) {
+        const corpoTabela = document.getElementById('corpo-tabela');
+        corpoTabela.innerHTML = '';
+
+        acoes.forEach((acao) => {
+            const tr = document.createElement('tr');
+
+            const ticker = acao.codigo || acao.sigla || acao.acao || acao.ticker || acao.Ticker || '-';
+            const nome = acao.nome || acao.Nome || acao.empresa || acao.Empresa || '-';
+            const precoNum = acao.preco_atual ?? acao.Cotacao ?? acao.preco ?? 0;
+            const preco = precoNum !== '-' ? Number(precoNum) : 0;
+
+            const variacaoBruta = acao.variacao ?? undefined;
+            const variacaoPercentualBruta = acao.variacao_percent ?? undefined;
+            
+            const resultadoDiaria = formatarVariacao(variacaoBruta, variacaoPercentualBruta);
+            const resultadoMensal = extrairValorParenteses(acao.variacao, variacaoBruta, variacaoPercentualBruta);
+
+            tr.dataset.ticker = String(ticker);
+            tr.dataset.preco = preco;
+            tr.dataset.diaria = resultadoDiaria.numero;
+            tr.dataset.mensal = resultadoMensal.numero;
+
+            tr.innerHTML = `
+                <td><button type="button" class="ticker-btn" data-ticker="${String(ticker).replace(/"/g, '&quot;')}" data-nome="${String(nome).replace(/"/g, '&quot;')}"><strong>${ticker}</strong></button></td>
+                <td>${nome}</td>
+                <td>${preco > 0 ? preco.toFixed(2) : '-'}</td>
+                <td class="${resultadoDiaria.classe}">${resultadoDiaria.texto}</td>
+                <td class="${resultadoMensal.classe}">${resultadoMensal.texto}</td>
+            `;
+
+            corpoTabela.appendChild(tr);
+        });
     }
 
     function normalizarTicker(ticker) {
@@ -875,46 +918,16 @@
             const response = await fetch('/api/acoes');
             const acoes = await response.json();
 
-            const corpoTabela = document.getElementById('corpo-tabela');
             const loading = document.getElementById('loading');
             const tabela = document.getElementById('tabela-acoes');
-
-            corpoTabela.innerHTML = '';
 
             if (!Array.isArray(acoes) || acoes.length === 0) {
                 loading.innerHTML = 'Nenhum dado encontrado na coleção.';
                 return;
             }
 
-            acoes.forEach((acao) => {
-                const tr = document.createElement('tr');
-
-                const ticker = acao.codigo || acao.sigla || acao.acao || acao.ticker || acao.Ticker || '-';
-                const nome = acao.nome || acao.Nome || acao.empresa || acao.Empresa || '-';
-                const precoNum = acao.preco_atual ?? acao.Cotacao ?? acao.preco ?? 0;
-                const preco = precoNum !== '-' ? Number(precoNum) : 0;
-
-                const variacaoBruta = acao.variacao ?? undefined;
-                const variacaoPercentualBruta = acao.variacao_percent ?? undefined;
-                
-                const resultadoDiaria = formatarVariacao(variacaoBruta, variacaoPercentualBruta);
-                const resultadoMensal = extrairValorParenteses(acao.variacao, variacaoBruta, variacaoPercentualBruta);
-
-                tr.dataset.ticker = String(ticker);
-                tr.dataset.preco = preco;
-                tr.dataset.diaria = resultadoDiaria.numero;
-                tr.dataset.mensal = resultadoMensal.numero;
-
-                tr.innerHTML = `
-                    <td><button type="button" class="ticker-btn" data-ticker="${String(ticker).replace(/"/g, '&quot;')}" data-nome="${String(nome).replace(/"/g, '&quot;')}"><strong>${ticker}</strong></button></td>
-                    <td>${nome}</td>
-                    <td>${preco > 0 ? preco.toFixed(2) : '-'}</td>
-                    <td class="${resultadoDiaria.classe}">${resultadoDiaria.texto}</td>
-                    <td class="${resultadoMensal.classe}">${resultadoMensal.texto}</td>
-                `;
-
-                corpoTabela.appendChild(tr);
-            });
+            dadosOriginaisAcoes = acoes; // Armazena os dados originais
+            preencherTabela(acoes);
 
             loading.classList.add('hidden');
             tabela.classList.remove('hidden');
@@ -927,6 +940,23 @@
     }
 
     document.getElementById('filtroTicker').addEventListener('input', aplicarFiltroTicker);
+
+    // Evento para o botão "Limpar Filtro"
+    document.getElementById('btnLimparFiltro').addEventListener('click', () => {
+        // 1. Limpa a caixa de busca
+        document.getElementById('filtroTicker').value = '';
+        
+        // 2. Reseta o estado de ordenação
+        ordemAtual = { coluna: null, direcao: 'asc' };
+        
+        // 3. Recarrega a tabela na ordem original dos dados
+        if (dadosOriginaisAcoes.length > 0) {
+            preencherTabela(dadosOriginaisAcoes);
+        }
+        
+        // 4. Garante que todas as linhas fiquem visíveis novamente
+        aplicarFiltroTicker();
+    });
 
     document.getElementById('btnAtualizarCotacoes').addEventListener('click', async () => {
         const btn = document.getElementById('btnAtualizarCotacoes');
