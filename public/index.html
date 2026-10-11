@@ -7,7 +7,7 @@
     <!-- Importação da fonte elegante Montserrat do Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
     
     <style>
         * {
@@ -15,7 +15,12 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
+            /* Fonte moderna e limpa com suporte a suavização avançada */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+            
             background: #eef3f5;
             margin: 0;
             padding: 20px;
@@ -52,22 +57,21 @@
             object-fit: contain;
         }
 
-        /* Restaurado: Título em Letras Douradas com Gradiente */
+        /* Título em Letras Douradas com Gradiente mais suave */
         h1 {
             margin: 0;
-            font-family: 'Montserrat', 'Trebuchet MS', Arial, sans-serif;
-            font-size: 2.6rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
+            font-family: 'Montserrat', -apple-system, sans-serif;
+            font-size: 2.4rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
             
-            /* Gradiente dourado fechado e profissional */
-            background: linear-gradient(135deg, #997420 0%, #b8860b 50%, #7a5814 100%);
+            /* Gradiente dourado suave */
+            background: linear-gradient(135deg, #a17c2a 0%, #c99a2c 50%, #8c6418 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             
-            /* Sombra suave para dar destaque ideal no fundo branco */
-            filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.12));
+            filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.08));
             line-height: 1.1;
         }
 
@@ -87,7 +91,6 @@
             padding: 8px 12px;
         }
 
-        /* Container do input de busca com ícone de Lupa */
         .search-box {
             position: relative;
             display: flex;
@@ -117,7 +120,6 @@
             border-color: #047857;
         }
 
-        /* Padronização dos botões (Estilo com ícone) */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -212,7 +214,7 @@
         th {
             background: #0f172a;
             color: white;
-            font-weight: 700;
+            font-weight: 600;
             user-select: none;
         }
 
@@ -224,7 +226,6 @@
             background: #1e293b;
         }
 
-        /* Cores alternadas na tabela (Zebra Striping) */
         tbody tr:nth-child(even) {
             background-color: #f8fafc;
         }
@@ -239,17 +240,17 @@
 
         .positivo {
             color: #16a34a;
-            font-weight: bold;
+            font-weight: 600;
         }
 
         .negativo {
             color: #dc2626;
-            font-weight: bold;
+            font-weight: 600;
         }
 
         .neutral {
             color: #64748b;
-            font-weight: bold;
+            font-weight: 600;
         }
 
         .hidden {
@@ -262,7 +263,7 @@
             color: #0f172a;
             cursor: pointer;
             font-size: 14px;
-            font-weight: 700;
+            font-weight: 600;
             padding: 0;
             text-align: left;
         }
@@ -302,6 +303,7 @@
             color: #0f172a;
             width: 34px;
             height: 34px;
+            border: none;
             border-radius: 50%;
             cursor: pointer;
             font-size: 20px;
@@ -355,13 +357,11 @@
 <div class="container">
     <div class="topbar">
         <div class="header-left">
-            <!-- Restaurado: Imagem da logo e Título Dourado -->
             <img src="logo.png" alt="Logo" class="logo">
             <h1>Painel BOVESPA - Ações</h1>
         </div>
 
         <div class="toolbar">
-            <!-- Campo de busca com ícone de Lupa -->
             <div class="search-box">
                 <svg viewBox="0 0 24 24"><path d="M21.71 20.29l-5.002-5.002C17.824 13.57 18.5 11.858 18.5 10c0-4.687-3.813-8.5-8.5-8.5S1.5 5.313 1.5 10s3.813 8.5 8.5 8.5c1.858 0 3.57-.676 5.288-1.788l5.002 5.002c.39.39 1.024.39 1.414 0 .39-.39.39-1.024 0-1.424zM10 16.5c-3.59 0-6.5-2.91-6.5-6.5s2.91-6.5 6.5-6.5 6.5 2.91 6.5 6.5-2.91 6.5-6.5 6.5z"/></svg>
                 <input
@@ -375,7 +375,6 @@
             
             <span id="ultimaAtualizacao" class="status">Última atualização: --</span>
             
-            <!-- Botão Atualizar Verde com Ícone -->
             <button id="btnAtualizarCotacoes" class="btn btn-verde">
                 <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
                 Atualizar cotações
@@ -487,7 +486,6 @@
         linhas.forEach((linha) => {
             const ticker = (linha.dataset.ticker || '').toUpperCase();
             const visivel = !filtro || ticker.includes(filtro);
-
             linha.style.display = visivel ? '' : 'none';
         });
     }
@@ -526,15 +524,8 @@
         if (!item || typeof item !== 'object') return null;
 
         const candidatos = [
-            item.close,
-            item.price,
-            item.value,
-            item.priceClose,
-            item.adjclose,
-            item.last,
-            item.regularMarketPrice,
-            item.prevClose,
-            item.closePrice
+            item.close, item.price, item.value, item.priceClose,
+            item.adjclose, item.last, item.regularMarketPrice, item.prevClose, item.closePrice
         ];
 
         for (const valor of candidatos) {
@@ -561,11 +552,7 @@
                 if (!Number.isFinite(valor) || valor <= 0 || !data) {
                     return null;
                 }
-
-                return {
-                    valor,
-                    data
-                };
+                return { valor, data };
             })
             .filter(Boolean)
             .slice(-120);
@@ -598,11 +585,11 @@
 
         ctx.fillStyle = '#1f2937';
         ctx.textAlign = 'left';
-        ctx.font = '700 20px Arial';
+        ctx.font = '600 20px -apple-system, sans-serif';
         ctx.fillText(nomeExibicao, padding.left, 30);
 
         ctx.fillStyle = '#047857';
-        ctx.font = '700 24px Arial';
+        ctx.font = '700 24px -apple-system, sans-serif';
         ctx.fillText(`R$ ${valorAtual.toFixed(2)}`, padding.left, 62);
 
         const legendX = width - 180;
@@ -618,7 +605,7 @@
         ctx.stroke();
 
         ctx.fillStyle = '#334155';
-        ctx.font = '12px Arial';
+        ctx.font = '12px -apple-system, sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText('Preço de Fechamento', legendX + 30, legendY + 6);
 
@@ -648,7 +635,7 @@
         ctx.stroke();
 
         ctx.fillStyle = '#475569';
-        ctx.font = '12px Arial';
+        ctx.font = '12px -apple-system, sans-serif';
         ctx.textAlign = 'right';
         for (let i = 0; i <= 5; i++) {
             const valor = maxValor - ((maxValor - minValor) / 5) * i;
@@ -679,7 +666,7 @@
         });
 
         ctx.fillStyle = '#475569';
-        ctx.font = '11px Arial';
+        ctx.font = '11px -apple-system, sans-serif';
         ctx.textAlign = 'center';
         const labelsCount = 8;
         const step = Math.max(1, Math.floor((pontos.length - 1) / labelsCount));
@@ -910,7 +897,7 @@
         }
     }
 
-    document.getElementById('filtroTicker').addEventListener('input', aplicarFiltroTicker);
+    document.getElementById('filtroTicker').index = document.getElementById('filtroTicker').addEventListener('input', aplicarFiltroTicker);
 
     document.getElementById('btnAtualizarCotacoes').addEventListener('click', async () => {
         const btn = document.getElementById('btnAtualizarCotacoes');
